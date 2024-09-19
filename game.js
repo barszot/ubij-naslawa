@@ -199,8 +199,8 @@ class Hammer
 
 let hammer = new Hammer();
 
-let mouseX = 0;
-let mouseY = 0;
+let mouseX = 900/2;
+let mouseY = 700/2;
 
 async function startGame() {
 
