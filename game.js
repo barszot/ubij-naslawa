@@ -1,59 +1,6 @@
-/*
-
-class Mole():
-    def __init__(self, index, x, y, sprite_sheet_img):
-        self.x = x
-        self.y = y
-        self.index = index
-        self.rect = pygame.Rect(x, y, RECT_WIDTH, RECT_HEIGHT)
-        self.lifespan = 0
-        self.frames = [
-            sprite_sheet_img.subsurface(pygame.Rect(386-28-RECT_WIDTH, 325-14-RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)),
-            sprite_sheet_img.subsurface(pygame.Rect(386, 325-14-RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)),
-            sprite_sheet_img.subsurface(pygame.Rect(386+28+RECT_WIDTH, 325-14-RECT_HEIGHT, RECT_WIDTH, RECT_HEIGHT)),
-            sprite_sheet_img.subsurface(pygame.Rect(386-28-RECT_WIDTH, 325, RECT_WIDTH, RECT_HEIGHT)),
-        ]
-
-    def draw(self, window, state):
-
-        frame_index = None
-        if state <= 0:
-            frame_index = 0
-        elif state > self.lifespan*0.95 or state < self.lifespan*0.05:
-            frame_index = 1
-        elif state > self.lifespan*0.9 or state < self.lifespan*0.1:
-            frame_index = 2
-        else:
-            frame_index = 3
-
-        window.blit(self.frames[frame_index], self.rect.topleft)
-
-    def set_lifespan(self, lifespan):
-        self.lifespan = lifespan
-
-    def is_clicked(self, event):
-
-        hammer_rect = pygame.Rect(
-            event.pos[0] - RECT_WIDTH/2,
-            event.pos[1] - RECT_HEIGHT/2,
-            int(0.35*RECT_WIDTH),
-            int(0.35*RECT_HEIGHT)
-        )
-
-        if self.rect.colliderect(hammer_rect):
-            return True
-        else:
-            return False
-
-
-
-*/
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-RECT_WIDTH = 128
-RECT_HEIGHT = 162
-
+let runningGame = false;
 let loadedImages = 0;  // Zmienna do liczenia załadowanych obrazów
 
 // Nasłuchuj kliknięcia na canvasie
@@ -87,172 +34,314 @@ spriteSheet.onload = function() {
     ++loadedImages;
 };
 
-const moleWidth = 128;
-const moleHeight = 162;
-let gameDuration = 60; // 60 seconds
-let board = new Array(9).fill(0); // Initial mole board (all moles hidden)
-
-let gameTime = 0;
-
-// Funkcja, która uruchamia grę
-function startGame() {
-    console.log("Gra została rozpoczęta!");
-    
-    // Rysuje tło gry
-    ctx.drawImage(gameBackgroundImage, 0, 0, canvas.width, canvas.height);
-    
-    // Rysuje krecika na odpowiednim miejscu
-    let score = 0;
-    gameTime = 0;
-    const spriteX = 1 * moleWidth;  // Wybierz właściwy krecik z sprite sheet'a
-    const spriteY = 0;  // Zakładam, że krecik jest w pierwszym wierszu sprite sheet'a
-    
-    // Rysowanie krecika na pozycji (100, 100)
-    ctx.drawImage(spriteSheet, 386-28-moleWidth, 325-14-moleHeight,   moleWidth, moleHeight, 100, 100, moleWidth, moleHeight);
-    
-    board.fill(0);  // Resetuje planszę z kretami
-}
-/*
-// Main game loop
-function gameLoop(timestamp) {
-    updateGame(1 / 60); // Assume 60 FPS for simplicity
-    requestAnimationFrame(gameLoop);
-}
-function drawMole(x, y, frame) {
-    const spriteX = frame * moleWidth;
-    ctx.drawImage(spriteSheet, spriteX, 0, moleWidth, moleHeight, x, y, moleWidth, moleHeight);
-}
 
 
-// Update the game state (moving moles, updating score, etc.)
-function updateGame(deltaTime) {
-    //board = updateBoard(board, 3, 0.002, 200); // Update moles on the board
 
-    // Clear the canvas and redraw the background
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(gameBackgroundImage, 0, 0, canvas.width, canvas.height);  // Rysuje obraz jako tło
+const RECT_WIDTH = 128;
+const RECT_HEIGHT = 162;
 
-    // Draw moles on the board (3x3 grid)
-    for (let i = 0; i < 9; i++) {
-        const x = (i % 3) * (moleWidth + 20) + 200;
-        const y = Math.floor(i / 3) * (moleHeight + 20) + 100;
-        const moleState = board[i];
-
-        if (moleState > 0) {
-            drawMole(x, y, 0); // Adjust this to use different frames for different mole states
+class Mole {
+    constructor(index, x, y)
+    {
+        this.index = index;
+        this.x = x;
+        this.y = y;
+        this.moleWidth = RECT_WIDTH;
+        this.moleHeight = RECT_HEIGHT;
+    }
+    draw(state)
+    {
+        if (state <= 0) {
+            ctx.drawImage(spriteSheet, 386-28-this.moleWidth, 325-14-this.moleHeight, this.moleWidth, this.moleHeight, this.x, this.y, this.moleWidth, this.moleHeight);
+        }
+        else if(state > this.lifespan*0.95 || state < this.lifespan*0.05)
+        {
+            ctx.drawImage(spriteSheet, 386, 325-14-this.moleHeight, this.moleWidth, this.moleHeight, this.x, this.y, this.moleWidth, this.moleHeight);
+        }
+        else if(state > self.lifespan*0.9 || state < self.lifespan*0.1)
+        {
+            ctx.drawImage(spriteSheet, 386+28+this.moleWidth, 325-14-this.moleHeight, this.moleWidth, this.moleHeight, this.x, this.y, this.moleWidth, this.moleHeight);
+        }
+        else
+        {
+            ctx.drawImage(spriteSheet, 386-28-this.moleWidth, 325, this.moleWidth, this.moleHeight, this.x, this.y, this.moleWidth, this.moleHeight);
         }
     }
-
-    // Update the game timer and check for game over
-    if (gameTime >= gameDuration) {
-        //gameRunning = false;
-        //showGameOver();
-    } else {
-        gameTime += deltaTime;
+    setLifespan(newLifespan)
+    {
+        this.lifespan = newLifespan
     }
-}
+    //TODO
+    /*
+    self.rect = pygame.Rect(x, y, RECT_WIDTH, RECT_HEIGHT)
 
-/*
+    def is_clicked(self, event):
 
+        hammer_rect = pygame.Rect(
+            event.pos[0] - RECT_WIDTH/2,
+            event.pos[1] - RECT_HEIGHT/2,
+            int(0.35*RECT_WIDTH),
+            int(0.35*RECT_HEIGHT)
+        )
 
-
-let highscore = 0;
-let gameDuration = 60; // 60 seconds
-let gameTime = 0;
-let gameRunning = false;
-let board = new Array(9).fill(0); // Initial mole board (all moles hidden)
-
-// Start game once both images are loaded
-let imagesLoaded = 0;
-function imageLoaded() {
-    imagesLoaded++;
-    if (imagesLoaded === 2) {
-        startGame(); // Start game after both background and sprite sheet are loaded
-    }
-}
-
-// Ensure both images are loaded before starting the game
-background.onload = imageLoaded;
-spriteSheet.onload = imageLoaded;
-
-// Function to draw the background image
-function drawBackground() {
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+        if self.rect.colliderect(hammer_rect):
+            return True
+        else:
+            return False
+    */
 }
 
 
-
-// Update the game state (moving moles, updating score, etc.)
-function updateGame(deltaTime) {
-    board = updateBoard(board, 3, 0.002, 200); // Update moles on the board
-
-    // Clear the canvas and redraw the background
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground(); // Draw the background first
-
-    // Draw moles on the board (3x3 grid)
-    for (let i = 0; i < 9; i++) {
-        const x = (i % 3) * (moleWidth + 20) + 200;
-        const y = Math.floor(i / 3) * (moleHeight + 20) + 100;
-        const moleState = board[i];
-
-        if (moleState > 0) {
-            drawMole(x, y, 0); // Adjust this to use different frames for different mole states
-        }
-    }
-
-    // Update the game timer and check for game over
-    if (gameTime >= gameDuration) {
-        gameRunning = false;
-        showGameOver();
-    } else {
-        gameTime += deltaTime;
-    }
-}
-
-// Show "Game Over" text when the game ends
-function showGameOver() {
-    ctx.fillStyle = "black";
-    ctx.font = "42px Comic Sans MS";
-    ctx.fillText("Game Over!", canvas.width / 2 - 100, canvas.height / 2);
-    ctx.fillText("Score: " + score, canvas.width / 2 - 100, canvas.height / 2 + 50);
-    highscore = Math.max(score, highscore);
-    ctx.fillText("High Score: " + highscore, canvas.width / 2 - 100, canvas.height / 2 + 100);
-}
-
-// Start the game and reset variables
-function startGame() {
-    gameRunning = true;
-    gameTime = 0;
-    score = 0;
-    board.fill(0); // Reset mole board
-    requestAnimationFrame(gameLoop); // Start the game loop
-}
-
-// Main game loop
-function gameLoop(timestamp) {
-    if (gameRunning) {
-        updateGame(1 / 60); // Assume 60 FPS for simplicity
-        requestAnimationFrame(gameLoop);
-    }
-}
-
-// Handle mouse click to detect mole whacking
-canvas.addEventListener('mousedown', function (event) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    for (let i = 0; i < 9; i++) {
-        const x = (i % 3) * (moleWidth + 20) + 200;
-        const y = Math.floor(i / 3) * (moleHeight + 20) + 100;
-
-        if (mouseX >= x && mouseX <= x + moleWidth && mouseY >= y && mouseY <= y + moleHeight) {
-            if (board[i] > 0) {
-                score += 10;
-                board[i] = -100; // Mark mole as whacked
+class MolesBoard
+{
+    constructor(maxMoles, probabilityOfMole)
+    {
+        this.maxMoles = Math.min(maxMoles, 9);
+        this.probabilityOfMole = probabilityOfMole;
+        this.moles = [];
+        this.states = new Array(9).fill(0);
+        this.indexes = Array.from({ length: 9 }, (_, index) => index);
+        
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const index = 3 * i + j;
+                const x = 230 - 14 + (28 + 14 + RECT_WIDTH) * i;
+                const y = 144 + (30 + RECT_HEIGHT) * j;
+                this.moles.push(new Mole(index, x, y));
             }
         }
     }
-});
-*/
+    draw()
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(gameBackgroundImage, 0, 0, canvas.width, canvas.height);
+        this.moles.forEach((mole, index) => {
+            mole.draw(this.states[index]);
+        });
+    }
+
+    getShuffledHoleIndexes(emptyHolesIndexes) {
+        const shuffledHoleIndexes = [...emptyHolesIndexes];
+        for (let i = shuffledHoleIndexes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledHoleIndexes[i], shuffledHoleIndexes[j]] = [shuffledHoleIndexes[j], shuffledHoleIndexes[i]];
+        }
+        return shuffledHoleIndexes;
+    }
+
+    getNewMolesIndexes(emptyHolesIndexes) {
+
+        const shuffledHoleIndexes = this.getShuffledHoleIndexes(emptyHolesIndexes);    
+        const newMolesIndexes = [];
+        const holesAmount = emptyHolesIndexes.length;
+
+        for (let i = 0; i < holesAmount; i++) {
+            const randomNumber = Math.random();
+            if (randomNumber < this.probabilityOfMole) {
+                if (newMolesIndexes.length < (this.maxMoles - (9-holesAmount))) {
+                    newMolesIndexes.push(i);
+                }
+            }
+        }
+    
+        return newMolesIndexes.map(index => shuffledHoleIndexes[index]);
+    }
+
+    updateBoard(lifespan, deltaTime) {
+        const holeIndexes = [];
+        for (let i = 0; i < 9; i++) {
+            if (this.states[i] === 0) {
+                holeIndexes.push(i);
+            } else if (this.states[i] > 0) {
+                this.states[i] = Math.max(0, this.states[i]-deltaTime);
+            }
+            else {
+                this.states[i] = 0;
+            }
+        }
+    
+        const newMolesIndexes = this.getNewMolesIndexes(holeIndexes);
+    
+        for (const index of newMolesIndexes) {
+            this.states[index] = lifespan;
+        }
+    }
+}
+
+let molesBoard = new MolesBoard(3, 0.005);
+
+
+class Hammer
+{
+    constructor()
+    {
+        this.rotated = false;
+    }
+    setRotate(rotated)
+    {
+        this.rotated = rotated;
+    }
+    getRotate()
+    {
+        return this.rotated;
+    }
+    draw(mouseX, mouseY){
+        if(!this.rotated)
+        {
+            ctx.drawImage(spriteSheet, 386, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
+        }
+        else
+        {
+            ctx.drawImage(spriteSheet, 386+RECT_WIDTH+28, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
+        }
+    }
+}
+
+let hammer = new Hammer();
+
+let mouseX = 0;
+let mouseY = 0;
+
+async function startGame() {
+
+    canvas.addEventListener('mousemove', (event) => {
+        mouseX = event.offsetX;
+        mouseY = event.offsetY;
+    });
+    canvas.addEventListener('mousedown', (event) => {
+        event.preventDefault(); // Zapobiega zaznaczaniu tekstu na stronie
+
+        hammer.setRotate(true);
+    });
+    
+    canvas.addEventListener('mouseup', (event) => {
+        hammer.setRotate(false);
+
+    });
+
+    let score = 0;
+    secondsOfGame = 0;
+    molesBoard.draw();
+    canvas.style.cursor = 'none'; // Ukrywa kursor
+    runningGame = true;
+    requestAnimationFrame(gameLoop);
+}
+
+let lastTimestamp = 0;
+const targetFps = 60;
+const frameDuration = 1000 / targetFps; // czas na klatkę w ms
+const gameDuration = 60;
+let elapsedTime = 0; // Czas, który upłynął w sekundach
+
+
+// Główna pętla gry
+function gameLoop(timestamp) {
+    // W rysowaniu młotka użyj aktualnej pozycji kursora
+
+    if (!runningGame) return;
+
+    const delta = timestamp - lastTimestamp;
+
+    if (delta >= frameDuration) {
+
+        lastTimestamp = timestamp - (delta % frameDuration); // Ustaw czas ostatniej klatki
+        elapsedTime += delta / 1000; // Zaktualizuj czas gry (w sekundach)
+
+        if (elapsedTime >= gameDuration) {
+            runningGame = false; // Zatrzymaj grę po 60 sekundach
+            alert("Gra się skończyła!"); // Możesz zmienić to na inny sposób powiadamiania
+        } else {
+            let lifespan = Math.floor((100 - elapsedTime)/4);
+            molesBoard.updateBoard(lifespan, delta / 1000);
+            molesBoard.draw();
+            hammer.draw(mouseX, mouseY);
+
+        }
+    }
+
+    requestAnimationFrame(gameLoop); // Wywołaj pętlę znowu
+}
+
+// Rozpocznij pętlę gry
+requestAnimationFrame(gameLoop);
+
+
+
+const Slonik = `
+                                                                                      .,,*/(#%&&@@@@@@@@&%#((/*,,                                                                                       
+                                                                        .*#&@@@@@@@@@@@@@@&%%%############%%%&@@@@@@@@@@@@@@&(,                                                                         
+                                                                 ,#&@@@@@@&#((////*************************************///(#%&@@@@@&%(.                                                                 
+                                                            *#@@@@@%(//**********************************************************//#%@@@@@#*                                                            
+                                                        *%@@@&#/************************************************************************(#&@@@%*                                                        
+                                                    .(@@@&#/********************************************************************************/#&@@@(.                                                    
+                                                  (@@@&/****************************************************************************************(&@@@*                                                  
+                                                &@@&(**********************************************************************************************(@@@#.                                               
+                                             .&@@&/**************************************************************************************************/&@@#                                              
+                                           .#@@%*******************************************************************************************************/&@@#                                            
+                                         ./@@&/**********************************************************************************************************(@@@*..                                        
+                            .*(#%@@@@@@@@@@@#/************************************************************************************************************/&@@@@@@@@@@@&%#/,                            
+                    ,(#&@@@@@@&%#(//***/@@@(****************************************************************************************************************#@@%/***//(#%%&@@@@@@%(*.                   
+              ,(&@@@@&&#(/**********//(@@@(*****************************************************************************************************************/#@@%////**********/#%&@@@@@#*.             
+          *&@@@@%(*********///(((((((#&@@(*******************************//(#%%%&%%#(//*************************//(##%%&%%#((/*******************************/%@@%(((((((((///********/#&@@@@/.         
+       /@@@@(********/(((((((((((((((&@@(****************************/#@@@@@@&##(#%&@@@@@&(/****************/#@@@@@@&%#(#%&@@@@@@(/***************************/&@@#(((((((((((((((///******/&@@@%.      
+    .&@@@/******/(((((((((((((((((((%@@%***************************&@@@#.               /@@@@/************%@@@&,               *@@@@(**************************(@@@(((((((((((((((((((((/*****/%@@@*    
+  .#@@%*****/((((((((((((((((((((((#&@@/************************/&@@&.                     /@@@(*******/%@@&.                     *@@@(*************************%@@%((((((((((((((((((((((((/****#@@@,  
+ .@@@(***/(((((((((((((((((((((((((%@@#/***********************(@@&.                         #@@%/****/@@&,                         /@@@/***********************/@@@#((((((((((((((((((((((((((***/&@@( 
+ &@&(***/((((((((((((((((((((((((((&@@(***********************(@@#                            *@@%/**/@@%.                           *@@&/***********************&@@%(((((((((((((((((((((((((((/***%@@*
+*@@#***(((((((((((((((((((((((((((#@@%/***********************&@&,                .,*,         #@@(**&@&*         ,*,.                (@@#***********************(@@&((((((((((((((((((((((((((((/**/@@#
+&@&(***/((((////******************#@@%/**********************/@@#.             ,@@@@@@@@%.     *@@#*/@@%.     .#@@@@@@@%.             *@@&/**********************/@@&(//*****************///(((((/**/%@@
+@@&/******************************%@@(***********************/@@%.            ,&@@@@@@@@@&     /@@#**@@&,    .%@@@@@@@@@@             /@@#************************@@&(*******************************#@@
+%@@(******************************&@&(************************#@@/            .%@@@@@@@@@%    .@@&/**(@@#     (@@@@@@@@@%            .@@@/************************&@@(******************************/%@&
+*@@#******************************@@&(************************/#@@/             ,@@@@@@@.    ,@@&/****#@@(     ,%@@@@@&,            ,&@@/************************/&@@#******************************/@@#
+ @@&/****************************/@@&/**************************#@@@,                      .%@@%*******(@@@*                      .#@@&**************************(%@@#******************************#@@/
+ /@@#/***************************/@@&/***************************/#@@@#.                 /&@@%/**********(@@@%,                 *&@@&/**************************((%@@#*****************************/@@%.
+ .%@@(***************************/@@&/******************************/%@@@@%#*,.   .,(#&@@@&(/**************/#@@@@%#*,.   .,/#&@@@&(/***************************/((%@@#/****************************&@@* 
+  ,&@&/***************************&@&(**********************************/#%&@@@@@@@@&%#(***********************/(%&@@@@@@@@&%#(/******************************/(((&@@#/***************************%@@(  
+   *@@&***************************#@@#***********************************************************************************************************************/((((@@@#/**************************#@@%   
+    *&@@/*************************/@@%/*********************************************************************************************************************/((((%@@&(/************************/%@@(    
+     ,@@@(*************************%@@(*****************************************************//#&@@@@@@&%(//************************************************/(((((@@@#(/***********************/%@@/     
+       &@@%************************(@@%/*************************************************#@@@@@&#(//((%@@@@@@%/*******************************************((((((%@@@(/***********************/@@@*      
+        *@@&/**********************/#@@(**********************************************(@@@&(/*************//%@@@#/**************************************/((((((#@@@#(/**********************%@@%.       
+         .#@@&**********************/&@@/**********************************************///********************//**************************************/(((((((#&@@#((/********************#@@@,         
+           ,&@@%/********************(&@@/***********************************************************************************************************((((((((#&@@%((/******************/(@@@/           
+             .&@@&/*******************/@@@(*********************************(%(******************************************(#(***********************((((((((((&@@%(((******************#@@&/             
+               .#@@@#/*****************/@@@#*******************************/#@@#****************************************&@@%********************/(((((((((((&@@%(((***************/(&@@&*               
+                ,%@@@@@#/****************%@@%/*************/#@@@@@@@@@@#/***/%@@#***************///////****************%@@%***/(&@@@@@@@@@%(**/(((((((((((#@@@#(((*************/(&@@@@*                 
+                ,%@&*(&@@@@(/*************(@@&/**********#@@@%.      ,%@@@%**/&@@/*********/#@@@@@@@@@@@@@%/**********#@@&*/#@@@&*       (@@@%(((((((((((&@@@((((**********/(%@@@@#%@@*                 
+                .%@@*****(@@@@@@%/*********/%@@&(*******#@@(            *@@@#*(@@@*******/#@@&/*********/%@@@********/&@@//@@@*            /@@&((((((((%@@@#((((/*****/#@@@@@@#***/%@@,                 
+                 #@@/********/(%@@@@@@@@@@@@@@@@@%((/**/@@#.            ,*&@@(*#@@%*********************************/%@@(*@@%.              #@@%(((((#@@@@@@@@@@@@@@@@@@&(//******/%@@.                 
+                 (@@(****************////////((%@@@%(((%@@*            .**@@&/*/@@@(********************************(@@%/*&@&*              .@@@#((#@@@&#((#####(///**************(&@&                  
+                 ,&@&*************************/((%@@@&(@@%.           .**&@@(***(@@%*******************************/%@@(**/@@&,              &@@#%@@@&#((((((((/*****************/#@@/                  
+                  %@@(**************************(((#@@@@@#.          .*/&@@(*****@@&(******************************/@@%//((#@@@,             #@@@@@%((((((((((/*****************/(&@@.                  
+                  *@@&***************************/((((&@@#          ,*#@@&/******#@@#***********///////************#@@%((((((&@@%            (@@&#((((((((((/******************((%@@(                   
+                   %@@(****************************/(((@@#.       .*(@@@%(((((((((@@%/*****/#@@@@@@@@@@@@@%/*******@@@#(((((((#@@@/          (@@%((((((((((******************/((#&@&,                   
+                   .@@&/*****************************((@@%.      ,/@@@&(((((((((((&@&(*****/%&(*********/#%/******/@@&#(((((((((#@@@/        %@@#((((((((/*****************/((((%@@/                    
+                    ,@@%/******************************%@@*    ,#@@@@&#(((((((((((%@@#****************************#@@%(((((((((((%@@@@(     .@@@#((((((*******************(((((%@@#                     
+                     *@@%/*****************************(@@# .*@@@@##&@@@@@&#((((((#@@#/***************************&@@%(((((#%@@@@@@##@@@&*  #@@%((((/*******************((((((#@@%                      
+                      /@@#/****************************/#@@@@@@%#((((((##%@@@@@@@&%@@%/**************************/@@@&&@@@@@@&##(((((((%@@@@@@&((/*******************/(((((((%@@&                       
+                       /@@%******************************////**/((((((((((((((#%%&@@@%/**************************/@@@@&%##((((((((((((((((###(//*******************/((((((((%@@&                        
+                        /@@&**************************************/(((((((((((((((#@@&/**************************/@@@#(((((((((((((((((((((/*********************/(((((((((%@@%                         
+                         ,@@@(****************************************/(((((((((((#&@&/**************************(@@@((((((((((((((((((/**********************/(((((((((((&@@/                          
+                           &@@#/*******************************************/((((((#&@&/**************************(@@@(((((((((((((/*************************/(((((((((((#@@@*                           
+                            *@@&/****************//#%@@@@@@@@@@@@%#(///**********/(&@&/**************************(@@@(((((((/*********//(#&@@@@@@@@@@@@%(((((((((((((((&@@%                             
+                             .#@@%************#@@@@@&#(/*****//(#&@@@@@@@@%/******/&@&/**************************(@@&/**********(&@@@@@@@@&#(/******/(#@@@@@@%(((((((%@@@,                              
+                               ,&@@%/******#@@@@(/********************//(#@@@@@@%//&@&/**************************/@@&/****(%@@@@@@#///*******************/(#@@@@#((#@@@/                                
+                                 *@@@%((*(@@@#/******************************/(%@@@@@%/**************************/@@&/#&@@@@#(/****************************((#%@@@@@@#.                                 
+                                   *@@@%@@@%/*********************************(@@@@@@%/**************************/@@@@@&(/**********************************/((#&@@&.                                   
+                                     *&@@@(*********************************(&@@#*(@@#/***************************&@@#***************************************/(((%@@%                                   
+                                     .%@@(*********************************#@@%/**#@@#****************************#@@#***************************************/((((%@@(                                  
+                                     (@@#*********************************%@@%****%@&(****************************(@@%/***************************************/((((%@@/                                 
+                                    ,&@&*********************************#@@&*****@@&/****************************/@@&/***************************************/((((#@@%.                                
+                                    /@@(*********************************@@@(****(@@%/****************************/&@@(****************************************(((((%@@*                                
+                                    #@@/********************************/@@@/****/%%/****************************((%@@#****************************************/((((%@@(                                
+                                   .&@&/*********************************@@@(**********************************/(((&@@(****************************************/((((#@@%                                
+                                   .&@%/*********************************#@@&(/******************************/((((#@@&/****************************************/((((#&@&                                
+                                   .@@%/**********************************&@@%((/**************************/(((((#@@@(*****************************************/((((#&@@                                
+                                   .&@&/******/(#&@@@@&%(/*******////******%@@&#((((//****************///(((((((%@@@##&@@@@&%(/*******////********/#&@@@@@@@%(/(((((#@@%                                
+                                    /@@(***/(@@@&#*,,*(&@@@%/#@@@@@@@@@@%/*%@@@@%((((((((((//////(((((((((((((#&@@@@@&#/,,*(&@@@%/#@@@@@@@@@@%//%@@@%*.   ,(&@@&#(((%@@*                                
+                                    .%@@/*/&@@*          ,%@@@%.      .#@@@@%,*&@@@#((((((((((((((((((((((((%@@@@@@/          .&@@@#.      .%@@@@%,          ,%@@%(%@@(                                 
+                                      #@@&%@@,           (@@/            /@@% ,*,#@@@@%#((((((((((((((((%@@@@@#%@@.           #@@#            *@@(         .***%@@@@@(                                  
+                                       .@@@@@*          ,&@#              %@@(******/%@@@@@@@@@@@@@@@@@@@&*.#@@@@@*          ,&@&              (@@*     .*****#@@@@&.                                   
+                                          *%@@@@&#*.    .%@@.            .@@@(****/(%&@@@@@@#/////*,,.        ,#@@@@@&#*.    .%@@.             &@@*,,,*/(%&@@@@@%,                                      
+                                              ,/#&@@@@@@@@@@@@@&%%%%%%&@@@@@@@@@@@@@@@%(*.                        .*(&@@@@@@@@@@@@@@&&%%%&&&@@@@@@@@@@@@@@&(*.                                          
+`;
