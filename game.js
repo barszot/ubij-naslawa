@@ -177,11 +177,11 @@ function manageClicking() {
         for (let index = 0; index < molesBoard.moles.length; index++) {
             const mole = molesBoard.moles[index];
             if (mole.isClicked())  {
-                    if(molesBoard.states[index] > 0){
+                if(molesBoard.states[index] > 0) {
                     molesBoard.states[index] = -lifespan / 2.0;  // Ustaw stan kreta na -lifespan/2.0
                     score += 10;                                 // Dodaj punkty
-                    break;                                       // Przerwij pętlę po obsłużeniu kliknięcia
                 }
+                break;                                       // Przerwij pętlę po obsłużeniu kliknięcia
             }
 
         }
@@ -217,8 +217,6 @@ class Hammer
 
 let highscore = localStorage.getItem('highscore') ? parseInt(localStorage.getItem('highscore')) : 0;
 
-
-
 function drawScores(remainingTime) {
 
     ctx.font = '42px "ComicSansCustom"';
@@ -234,7 +232,6 @@ let endGameClickHandler;
 let hammer = new Hammer();
 
     
-
 let startGame = function () {
 
     if (runningGame === false){
@@ -273,7 +270,6 @@ const gameDuration = 60;
 
 // Główna pętla gry
 function gameLoop(timestamp) {
-    // W rysowaniu młotka użyj aktualnej pozycji kursora
 
     if (!runningGame) endGame();
     else {
