@@ -1,8 +1,19 @@
+canvas {
+    display: block;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+}
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #fafafa;
+    text-align: center;
+    background-color: #030c3f;
+    font-family: 'ComicSansCustom', sans-serif; /* Dla przykładu, jak można użyć w CSS */
+
+}
+h1 {
+    color: yellow;
+    font-size: 42px;
+}
+@font-face {
+    font-family: 'ComicSansCustom';
+    src: url('fonts/COMICSANS.TTF') format('truetype');
 }
