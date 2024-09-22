@@ -301,7 +301,7 @@ function gameLoop(timestamp) {
 function drawEndScores()
 {
         ctx.font = '64px "ComicSansCustom"';
-        ctx.fillStyle = 'yellow';
+        ctx.fillStyle = '#f2cf08';
         ctx.fillText(score, 575, 360);
         ctx.fillText(highscore, 725, 465);
 }
