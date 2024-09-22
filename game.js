@@ -278,9 +278,7 @@ function gameLoop(timestamp) {
     if (!runningGame) endGame();
     else {
         const delta = timestamp - lastTimestamp;
-        if (delta>100.0){
-        console.log(delta);
-        }
+
         if (delta >= frameDuration) {
 
             lastTimestamp = timestamp - (delta % frameDuration); // Ustaw czas ostatniej klatki
