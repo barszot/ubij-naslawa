@@ -179,7 +179,7 @@ function manageClicking() {
             if (mole.isClicked())  {
                 if(molesBoard.states[index] > 0) {
                     molesBoard.states[index] = -lifespan / 2.0;  // Ustaw stan kreta na -lifespan/2.0
-                    score += 10;                                 // Dodaj punkty
+                    score += 15;                                 // Dodaj punkty
                 }
                 break;                                       // Przerwij pętlę po obsłużeniu kliknięcia
             }
@@ -218,7 +218,6 @@ class Hammer
 let highscore = localStorage.getItem('highscore') ? parseInt(localStorage.getItem('highscore')) : 0;
 
 function drawScores(remainingTime) {
-
     ctx.font = '42px "ComicSansCustom"';
     ctx.fillStyle = 'black';
     ctx.fillText("Wynik:  " + score, 15, 50);
@@ -231,10 +230,15 @@ let elapsedTime = 0; // Czas, który upłynął w sekundach
 let endGameClickHandler;
 let hammer = new Hammer();
 
-    
+let lastTimestamp = 0;
+
+let gameStartTime = 0; // Nowa zmienna, która przechowuje czas rozpoczęcia gry
+
 let startGame = function () {
 
     if (runningGame === false){
+        lastTimestamp = 0;
+        elapsedTime = 0;
 
         // Usuń poprzedni nasłuchiwacz, jeśli istnieje
         if (endGameClickHandler) {
@@ -254,16 +258,16 @@ let startGame = function () {
             hammer.setRotate(false);
         });
 
-        elapsedTime = 0;
         score = 0;
         canvas.style.cursor = 'none'; // Ukrywa kursor
         runningGame = true;
+        gameStartTime = performance.now();  // Ustawiamy czas rozpoczęcia gry
+
         requestAnimationFrame(gameLoop);
     }
 }
 
 
-let lastTimestamp = 0;
 const targetFps = 60;
 const frameDuration = 1000 / targetFps; // czas na klatkę w ms
 const gameDuration = 60;
@@ -274,10 +278,14 @@ function gameLoop(timestamp) {
     if (!runningGame) endGame();
     else {
         const delta = timestamp - lastTimestamp;
+        if (delta>100.0){
+        console.log(delta);
+        }
         if (delta >= frameDuration) {
 
             lastTimestamp = timestamp - (delta % frameDuration); // Ustaw czas ostatniej klatki
-            elapsedTime += delta / 1000; // Zaktualizuj czas gry (w sekundach)
+            //elapsedTime += delta / 1000; // Zaktualizuj czas gry (w sekundach)
+            elapsedTime = (timestamp - gameStartTime) / 1000; // Zaktualizuj czas gry (w sekundach)
 
             if (elapsedTime >= gameDuration) {
                 runningGame = false; // Zatrzymaj grę po 60 sekundach
@@ -289,7 +297,6 @@ function gameLoop(timestamp) {
                 drawScores(gameDuration - Math.floor(elapsedTime));
             }
         }
-
         requestAnimationFrame(gameLoop); // Wywołaj pętlę znowu
     }
 }   
