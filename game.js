@@ -80,7 +80,7 @@ class Mole {
     }
 
     isClicked() {
-        let hammerRect = { x: mouseX - RECT_WIDTH/2, y: mouseY - RECT_HEIGHT/2, width: Math.floor(0.35*RECT_WIDTH), height: Math.floor(0.35*RECT_HEIGHT) };
+        let hammerRect = { x: mouseX - RECT_WIDTH/2, y: mouseY - RECT_HEIGHT/2, width: Math.floor(0.45*RECT_WIDTH), height: Math.floor(0.45*RECT_HEIGHT) };
         return rectanglesCollide(this.rect, hammerRect);
     }
 
