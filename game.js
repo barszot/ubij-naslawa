@@ -22,7 +22,8 @@ function imageLoaded() {
     if (loadedImages === 5) {
         // Wszystkie obrazy załadowane, rozpocznij grę
         ctx.drawImage(startBackgroundImage, 0, 0, canvas.width, canvas.height);  // Rysuje obraz jako tło na początku
-        canvas.addEventListener('click', manageClicking);
+        canvas.addEventListener('mousedown', (event) => {manageClicking(event, false)});
+        canvas.addEventListener('touchstart', (event) => {manageClicking(event, true)});
     }
 }
 
@@ -168,11 +169,19 @@ let score = 0;
 let molesBoard = new MolesBoard(4, 0.003);
 
 canvas.style.cursor = 'default';
-function manageClicking() {
+function manageClicking(event, onPhone) {
     if (runningGame === false) {
         startGame();
     }
     else {
+        event.preventDefault(); // Zapobiega zaznaczaniu tekstu na stronie
+        if(onPhone){
+            const touch = event.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            mouseX = touch.clientX - rect.left;
+            mouseY = touch.clientY - rect.top;
+        }
+        hammer.setRotate(true);
         score -= 5;
         for (let index = 0; index < molesBoard.moles.length; index++) {
             const mole = molesBoard.moles[index];
@@ -249,14 +258,23 @@ let startGame = function () {
             mouseX = event.offsetX;
             mouseY = event.offsetY;
         });
-        canvas.addEventListener('mousedown', (event) => {
-            event.preventDefault(); // Zapobiega zaznaczaniu tekstu na stronie
-            hammer.setRotate(true);
+
+        canvas.addEventListener('touchmove', (event) => {
+            const touch = event.touches[0];
+
+            const rect = canvas.getBoundingClientRect();  // Pobierz pozycję i rozmiar kanwy
+            mouseX = touch.clientX - rect.left;           // Przelicz współrzędne X
+            mouseY = touch.clientY - rect.top;            // Przelicz współrzędne Y
         });
         
         canvas.addEventListener('mouseup', (event) => {
             hammer.setRotate(false);
         });
+
+        canvas.addEventListener('touchend', (event) => {
+            hammer.setRotate(false);
+        });
+
 
         score = 0;
         canvas.style.cursor = 'none'; // Ukrywa kursor
