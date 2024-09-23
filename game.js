@@ -171,16 +171,27 @@ let molesBoard = new MolesBoard(4, 0.003);
 canvas.style.cursor = 'default';
 function manageClicking(event, onPhone) {
     if (runningGame === false) {
+        if(onPhone)
+        {
+            //hammer.setVisibility(false);
+        }
         startGame();
     }
     else {
         event.preventDefault(); // Zapobiega zaznaczaniu tekstu na stronie
-        if(onPhone){
+        // Używamy rect do uzyskania aktualnych wymiarów canvas
+        const rect = canvas.getBoundingClientRect();
+        
+        let scaleX = canvas.width / rect.width;  // Przelicznik X
+        let scaleY = canvas.height / rect.height; // Przelicznik Y
+
+        if (onPhone) {
+            hammer.setVisibility(true);
             const touch = event.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            mouseX = touch.clientX - rect.left;
-            mouseY = touch.clientY - rect.top;
-        }
+            // Oblicz współrzędne dotyku
+            mouseX = (touch.clientX - rect.left) * scaleX; 
+            mouseY = (touch.clientY - rect.top) * scaleY; 
+        } 
         hammer.setRotate(true);
         score -= 5;
         for (let index = 0; index < molesBoard.moles.length; index++) {
@@ -202,6 +213,7 @@ class Hammer
     constructor()
     {
         this.rotated = false;
+        this.visible = true;
     }
     setRotate(rotated)
     {
@@ -212,14 +224,20 @@ class Hammer
         return this.rotated;
     }
     draw(){
-        if(!this.rotated)
-        {
-            ctx.drawImage(spriteSheet, 386, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
+        if(this.visible){
+            if(!this.rotated)
+            {
+                ctx.drawImage(spriteSheet, 386, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
+            }
+            else
+            {
+                ctx.drawImage(spriteSheet, 386+RECT_WIDTH+28, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
+            }
         }
-        else
-        {
-            ctx.drawImage(spriteSheet, 386+RECT_WIDTH+28, 325, RECT_WIDTH, RECT_HEIGHT, mouseX-RECT_WIDTH/2, mouseY-RECT_HEIGHT/2, RECT_WIDTH, RECT_HEIGHT);
-        }
+    }
+    setVisibility(visibility)
+    {
+        this.visible = visibility;
     }
 }
 
@@ -255,16 +273,20 @@ let startGame = function () {
         }
 
         canvas.addEventListener('mousemove', (event) => {
-            mouseX = event.offsetX;
-            mouseY = event.offsetY;
+            const rect = canvas.getBoundingClientRect();  // Pobierz pozycję i rozmiar kanwy
+            let scaleX = canvas.width / rect.width;  // Przelicznik X
+            let scaleY = canvas.height / rect.height; // Przelicznik Y
+            mouseX = (event.offsetX) * scaleX;
+            mouseY = (event.offsetY) * scaleY;
         });
 
         canvas.addEventListener('touchmove', (event) => {
             const touch = event.touches[0];
-
             const rect = canvas.getBoundingClientRect();  // Pobierz pozycję i rozmiar kanwy
-            mouseX = touch.clientX - rect.left;           // Przelicz współrzędne X
-            mouseY = touch.clientY - rect.top;            // Przelicz współrzędne Y
+            let scaleX = canvas.width / rect.width;  // Przelicznik X
+            let scaleY = canvas.height / rect.height; // Przelicznik Y
+            mouseX = (touch.clientX - rect.left) * scaleX;           // Przelicz współrzędne X
+            mouseY = (touch.clientY - rect.top) * scaleY;            // Przelicz współrzędne Y
         });
         
         canvas.addEventListener('mouseup', (event) => {
@@ -273,6 +295,7 @@ let startGame = function () {
 
         canvas.addEventListener('touchend', (event) => {
             hammer.setRotate(false);
+            //hammer.setVisibility(false);
         });
 
 

@@ -2,28 +2,53 @@ canvas {
     display: block;
     margin: 0 auto;
     background-color: #f0f0f0;
+    max-width: 100%; /* Umożliwia canvas responsywność */
+    height: auto; /* Zachowuje proporcje */
 }
+
 body {
     text-align: center;
     background-color: #000000;
-    font-family: 'ComicSansCustom', sans-serif; /* Dla przykładu, jak można użyć w CSS */
-
+    font-family: 'ComicSansCustom', sans-serif;
+    display: flex; /* Flexbox do centrowania */
+    flex-direction: column; /* Ułożenie w kolumnie */
+    align-items: center; /* Wyśrodkowanie w poziomie */
+    justify-content: center; /* Wyśrodkowanie w pionie */
+    height: 100vh; /* Wysokość widoku */
+    margin: 0; /* Usunięcie domyślnych marginesów */
 }
-h1 {
+
+h1, h2, p {
     color: #f2cf08;
+    margin: 10px 0; /* Dodatkowe marginesy dla lepszego układu */
+}
+
+h1 {
     font-size: 42px;
 }
+
 h2 {
-    color: #f2cf08;
     font-size: 30px;
-
 }
+
 p {
-    color: #f2cf08;
     font-size: 20px;
-
 }
+
 @font-face {
     font-family: 'ComicSansCustom';
     src: url('fonts/COMICSANS.TTF') format('truetype');
+}
+
+/* Dostosowanie dla mniejszych ekranów */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 32px; /* Zmniejszenie rozmiaru nagłówka */
+    }
+    h2 {
+        font-size: 24px; /* Zmniejszenie rozmiaru nagłówka */
+    }
+    p {
+        font-size: 18px; /* Zmniejszenie rozmiaru tekstu */
+    }
 }
